@@ -50,34 +50,3 @@ sensor:
     method: left
     unit_prefix: k
     name: solar_panel_production_sma_kwh
-
-utility_meter:
-  ### Daily
-  solar_panel_production_sma_daily:
-    source: sensor.solar_panel_production_sma_kwh
-    name: Solar Panel Production SMA Daily
-    cycle: daily
-  solar_panel_production_se_daily:
-    source: sensor.solar_panel_production_se_kwh
-    name: Solar Panel Production SE Daily
-    cycle: daily
- 
-  #### Weekly
-  solar_panel_production_sma_weekly:
-    source: sensor.solar_panel_production_sma_kwh
-    name: Solar Panel Production SMA Weekly
-    cycle: weekly
-  solar_panel_production_se_weekly:
-    source: sensor.solar_panel_production_se_kwh
-    name: Solar Panel Production SE Weekly
-    cycle: weekly
-
-  ####### Yearly
-  solar_panel_production_sma_yearly:
-    source: sensor.solar_panel_production_sma_kwh
-    name: Solar Panel Production SMA Yearly
-    cycle: yearly
-  solar_panel_production_se_yearly:
-    source: sensor.solar_panel_se_production_kwh
-    name: Solar Panel Production SE Yearly
-    cycle: yearly
