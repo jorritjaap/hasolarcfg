@@ -1,0 +1,83 @@
+template:
+  - sensor:
+      - name: "Solar Panel Production W"
+        unique_id: solar_panel_production_w
+        unit_of_measurement: "W"
+        icon: mdi:solar-power
+        state: >
+          {% set solar_edge = states('sensor.solar_panel_production_se_w') | float(0) %}
+          {% set sma = states('sensor.solar_panel_production_sma_w') | float(0) %}
+          {{ (solar_edge + sma) }}
+
+      - name: "Solar Panel Production SE W"
+        unique_id: solar_panel_production_se_w
+        unit_of_measurement: "W"
+        icon: mdi:solar-power
+        state: >
+          {% set i1_dc_power = states('sensor.solaredge_i1_dc_power') | float(0) %}
+          {% set b1_dc_power = states('sensor.solaredge_b1_dc_power') | float(0) %}
+
+          {% if (is_state('sensor.solaredge_i1_dc_power', 'unknown') or is_state('sensor.solaredge_b1_dc_power', 'unknown')) %}
+            0
+          {% elif (i1_dc_power + b1_dc_power <= 0) %}
+            0
+          {% else %}
+            {{ (i1_dc_power + b1_dc_power) }}
+          {% endif %}
+        availability: >
+          {{ states('sensor.solaredge_i1_dc_power') | is_number and states('sensor.solaredge_i1_ac_power') | is_number and states('sensor.solaredge_b1_dc_power') | is_number }}
+
+      - name: "Solar Panel Production SMA W"
+        unique_id: solar_panel_production_sma_w
+        unit_of_measurement: "W"
+        icon: mdi:solar-power
+        state: >
+          {% set m2_ac_power = states('sensor.solaredge_m2_ac_power') | float(0) %}
+
+          {{ m2_ac_power }}
+        availability: >
+          {{ states('sensor.solaredge_m2_ac_power') | is_number}}
+
+
+sensor:
+  - platform: integration
+    source: sensor.solar_panel_production_se_w
+    method: left
+    unit_prefix: k
+    name: solar_panel_production_se_kwh
+  - platform: integration
+    source: sensor.solar_panel_production_sma_w
+    method: left
+    unit_prefix: k
+    name: solar_panel_production_sma_kwh
+
+utility_meter:
+  ### Daily
+  solar_panel_production_sma_daily:
+    source: sensor.solar_panel_production_sma_kwh
+    name: Solar Panel Production SMA Daily
+    cycle: daily
+  solar_panel_production_se_daily:
+    source: sensor.solar_panel_production_se_kwh
+    name: Solar Panel Production SE Daily
+    cycle: daily
+ 
+  #### Weekly
+  solar_panel_production_sma_weekly:
+    source: sensor.solar_panel_production_sma_kwh
+    name: Solar Panel Production SMA Weekly
+    cycle: weekly
+  solar_panel_production_se_weekly:
+    source: sensor.solar_panel_production_se_kwh
+    name: Solar Panel Production SE Weekly
+    cycle: weekly
+
+  ####### Yearly
+  solar_panel_production_sma_yearly:
+    source: sensor.solar_panel_production_sma_kwh
+    name: Solar Panel Production SMA Yearly
+    cycle: yearly
+  solar_panel_production_se_yearly:
+    source: sensor.solar_panel_se_production_kwh
+    name: Solar Panel Production SE Yearly
+    cycle: yearly
